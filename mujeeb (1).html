@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مُجيب | MUJEEB - محاكاة الاستجابة الطارئة قبل المستشفى</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#0b132b',
+                            900: '#070d1f',
+                            950: '#03060f'
+                        },
+                        mjeeb: {
+                            blue: '#0083a0',
+                            teal: '#00b4d8',
+                            darkTeal: '#005f73',
+                            coral: '#ff6b6b',
+                            orange: '#e76f51',
+                            green: '#2a9d8f'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #03060f;
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070d1f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0083a0;
+            border-radius: 3px;
+        }
+
+        .glass-panel {
+            background: rgba(11, 19, 43, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 179, 216, 0.25);
+        }
+
+        .device-bezel {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 15px 25px rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(0, 180, 216, 0.4);
+        }
+
+        .lcd-screen {
+            background: #020617;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.9);
+            border: 1.5px solid rgba(0, 180, 216, 0.3);
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.03); opacity: 0.9; }
+        }
+        .pulse-effect {
+            animation: pulse-slow 2s infinite ease-in-out;
+        }
+
+        /* Responsive height fixes for mobile devices */
+        @media (max-width: 640px) {
+            .scene-container {
+                min-height: 280px;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-mjeeb-teal selection:text-navy-900">
+
+    <!-- TOP APPLICATION HEADER & OFFICIAL BRANDING -->
+    <header class="w-full glass-panel sticky top-0 z-50 px-3 md:px-6 py-2 border-b border-mjeeb-teal/30 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2 md:gap-4">
+            
+            <!-- OFFICIAL MUJEEB BRANDING & LOGO DISPLAY -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-2 bg-navy-900/80 px-2.5 py-1.5 rounded-xl border border-mjeeb-teal/30 shadow-inner">
+                    <!-- MUJEEB Official Logo Icon Vector -->
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10 shrink-0" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 140 40 A 70 70 0 1 0 160 140 A 55 55 0 1 1 140 40 Z" fill="#0083a0" />
+                        <path d="M 155 80 C 155 60, 135 45, 120 60 C 110 70, 120 100, 120 100 C 120 100, 155 100, 155 80 Z" fill="#ff6b6b" />
+                        <polygon points="120,35 124,47 136,51 124,55 120,67 116,55 104,51 116,47" fill="#ff6b6b" />
+                        <path d="M 40 105 L 80 105 L 90 80 L 105 130 L 120 95 L 130 110 L 160 110" stroke="#0083a0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="text-right">
+                        <div class="text-base sm:text-lg md:text-xl font-black text-white leading-tight flex items-center gap-1">
+                            <span>مُجيب</span>
+                            <span class="text-mjeeb-teal font-light text-[10px] sm:text-xs border-r border-white/20 pr-1 mr-0.5">MUJEEB</span>
+                        </div>
+                        <div class="text-[9px] sm:text-[10px] text-mjeeb-teal font-semibold tracking-wide">نظام دعم القرار الإسعافي الذكي</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREHOSPITAL ENVIRONMENT INDICATOR -->
+            <div class="hidden md:flex items-center gap-2 bg-emerald-950/40 border border-emerald-500/40 px-3 py-1 rounded-full text-xs text-emerald-300">
+                <i class="fa-solid fa-tree"></i>
+                <span class="font-bold">موقع المريض (مكان عام - قبل المستشفى)</span>
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            </div>
+
+            <!-- EMERGENCY BUTTON ON DEVICE HEADER -->
+            <button onclick="triggerEmergencyCall()" class="bg-red-600 hover:bg-red-700 active:scale-95 text-white text-xs sm:text-sm font-extrabold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-red-900/50">
+                <i class="fa-solid fa-phone-flip animate-bounce text-xs"></i>
+                <span>طوارئ — 997</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="max-w-7xl w-full mx-auto p-2 sm:p-4 md:p-5 flex-grow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4">
+
+        <!-- PANEL A: PATIENT INFO & STAGE PROGRESS (3 Cols on Desktop, Full on Mobile/Tablet) -->
+        <section class="md:col-span-1 lg:col-span-3 flex flex-col sm:flex-row lg:flex-col gap-3 sm:gap-4">
+            
+            <!-- Patient Profile Info -->
+            <div class="glass-panel rounded-2xl p-3.5 sm:p-4 shadow-xl border border-white/10 w-full">
+                <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
+                    <h2 class="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                        <i class="fa-solid fa-id-card text-mjeeb-teal"></i>
+                        بيانات المريض
+                    </h2>
+                    <span class="text-[10px] bg-red-500/20 text-red-300 font-bold px-2 py-0.5 rounded border border-red-500/30">
+                        خارج المستشفى
+                    </span>
+                </div>
+
+                <div class="space-y-1.5 text-xs">
+                    <div class="flex justify-between items-center bg-white/5 p-1.5 sm:p-2 rounded-lg">
+                        <span class="text-slate-400">العمر / الجنس:</span>
+                        <span class="font-bold text-slate-100">46 سنة / ذكر</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-red-500/10 p-1.5 sm:p-2 rounded-lg border border-red-500/20">
+                        <span class="text-red-300 font-bold">الحالة الرئيسيّة:</span>
+                        <span class="font-extrabold text-red-200">ألم في الصدر</span>
+                    </div>
+                    <div class="bg-white/5 p-1.5 sm:p-2 rounded-lg space-y-1">
+                        <span class="text-slate-400 text-[11px] block">الأعراض المصاحبة:</span>
+                        <div class="flex flex-wrap gap-1 mt-0.5">
+                            <span class="text-[10px] bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded border border-amber-700/40">دوخة</span>
+                            <span class="text-[10px] bg-amber-950/80 text-amber-300 px-2 py-0.5 rounded border border-amber-700/40">ضيق تنفس</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-900/80 p-1.5 sm:p-2 rounded-lg border border-slate-700/50">
+                        <span class="text-slate-400">درجة الوعي:</span>
+                        <span id="patientAwarenessTag" class="font-bold text-slate-400 text-[11px]">مجهولة / لم تفحص</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIMULATION STAGE PROGRESS -->
+            <div class="glass-panel rounded-2xl p-3.5 sm:p-4 shadow-xl border border-white/10 flex-grow flex flex-col justify-between w-full">
+                <div>
+                    <h3 class="font-bold text-xs text-slate-400 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-list-check text-mjeeb-teal"></i>
+                        المرحلة الحالية
+                    </h3>
+                    <div id="currentStageTitle" class="text-xs sm:text-sm font-extrabold text-mjeeb-teal bg-mjeeb-teal/10 p-2 sm:p-2.5 rounded-xl border border-mjeeb-teal/30 mb-2">
+                        المرحلة 1: استقبال المريض
+                    </div>
+                    <p id="currentStageDesc" class="text-xs text-slate-300 leading-relaxed">
+                        وصلت إلى المريض في مكان عام. يعاني من ألم في الصدر ودوخة وضيق في التنفس.
+                    </p>
+                </div>
+
+                <div class="mt-3 pt-2 border-t border-white/10">
+                    <div class="text-[11px] font-bold text-slate-400 mb-1 flex justify-between items-center">
+                        <span>سجل الإجراءات</span>
+                        <span id="completedCount" class="bg-mjeeb-teal/20 text-mjeeb-teal px-1.5 py-0.5 rounded text-[10px]">0/10</span>
+                    </div>
+                    <div id="timelineMiniList" class="space-y-1 max-h-24 sm:max-h-28 overflow-y-auto text-[11px]">
+                        <div class="text-slate-500 italic text-center py-1">في انتظار بدء الخطوات</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL B: DIGITAL PREHOSPITAL SCENE (5 Cols on Desktop, Full on Mobile) -->
+        <section class="md:col-span-1 lg:col-span-5 flex flex-col gap-4">
+            <div class="glass-panel rounded-2xl p-3 sm:p-4 shadow-xl border border-white/10 flex flex-col h-full min-h-[300px] sm:min-h-[360px] relative overflow-hidden">
+                
+                <!-- Environment Badge -->
+                <div class="absolute top-2.5 right-2.5 z-10 bg-navy-950/85 backdrop-blur-md text-slate-200 text-[10px] sm:text-xs px-2.5 py-1 rounded-full border border-white/20 flex items-center gap-1">
+                    <i class="fa-solid fa-tree text-emerald-400"></i>
+                    <span>مكان عام (قبل المستشفى)</span>
+                </div>
+
+                <!-- Digital Patient Visual Area -->
+                <div class="relative w-full flex-grow rounded-xl bg-gradient-to-b from-navy-900 via-navy-950 to-slate-950 p-3 sm:p-4 border border-white/10 flex flex-col justify-between items-center overflow-hidden scene-container">
+                    
+                    <!-- Prehospital Environment Canvas Graphics -->
+                    <div class="absolute inset-0 opacity-10 pointer-events-none flex justify-around items-center">
+                        <i class="fa-solid fa-tree text-6xl sm:text-8xl text-slate-400"></i>
+                        <i class="fa-solid fa-bench-tree text-6xl sm:text-8xl text-slate-400"></i>
+                    </div>
+
+                    <!-- Digital Human Patient Avatar -->
+                    <div class="relative z-10 w-full flex-grow flex items-center justify-around py-3 sm:py-4 gap-2">
+                        
+                        <!-- Patient Representation -->
+                        <div class="flex flex-col items-center text-center transition-all duration-300" id="patientAvatarContainer">
+                            <div class="relative">
+                                <div id="patientHalo" class="absolute -inset-1.5 rounded-full bg-amber-500/20 animate-pulse"></div>
+                                <div class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full bg-slate-800 border-3 sm:border-4 border-amber-500/80 shadow-2xl flex items-center justify-center relative overflow-hidden">
+                                    <i class="fa-solid fa-user-tie text-4xl sm:text-5xl md:text-6xl text-amber-200"></i>
+                                </div>
+
+                                <!-- Dynamic Sensor Attachments Visuals -->
+                                <div id="sensorAttachmentFinger" class="hidden absolute top-0 -right-2 bg-mjeeb-teal text-navy-950 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shadow animate-bounce">
+                                    حساس الإصبع
+                                </div>
+                                <div id="sensorAttachmentCuff" class="hidden absolute bottom-1 -right-2 bg-blue-500 text-white text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shadow">
+                                    كفة الضغط
+                                </div>
+                                <div id="sensorAttachmentTemp" class="hidden absolute top-0 -left-2 bg-amber-400 text-navy-950 text-[9px] sm:text-[10px] font-extrabold px-1.5 py-0.5 rounded-full shadow">
+                                    حساس الحرارة
+                                </div>
+                            </div>
+                            <span class="mt-1.5 text-xs sm:text-sm font-bold text-slate-200">المريض (46 سنة)</span>
+                            <span id="patientPostureTag" class="text-[10px] sm:text-[11px] text-amber-300 bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-800/40 mt-0.5">
+                                متكئ في مكان عام
+                            </span>
+                        </div>
+
+                        <!-- First Responder Avatar -->
+                        <div class="flex flex-col items-center text-center">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-mjeeb-darkTeal border-3 sm:border-4 border-mjeeb-teal shadow-2xl flex items-center justify-center relative">
+                                <i class="fa-solid fa-user-nurse text-3xl sm:text-4xl md:text-5xl text-teal-100"></i>
+                            </div>
+                            <span class="mt-1.5 text-xs sm:text-sm font-bold text-slate-200">المستجيب الأول</span>
+                            <span class="text-[10px] sm:text-[11px] text-mjeeb-teal font-semibold">يقوم بالتقييم</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Scene Action Indicator -->
+                    <div id="sceneActionBanner" class="relative z-10 w-full bg-navy-900/90 border border-mjeeb-teal/40 rounded-xl p-2 sm:p-2.5 text-center shadow-lg backdrop-blur-md">
+                        <div class="text-[10px] sm:text-[11px] text-mjeeb-teal font-bold mb-0.5">
+                            <i class="fa-solid fa-street-view ml-1"></i> المشهد الإسعافي في الموقع
+                        </div>
+                        <div id="sceneActionText" class="text-xs sm:text-sm font-bold text-white">
+                            وصلت إلى المريض. يعاني من ألم في الصدر ودوخة وضيق في التنفس.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PANEL C: ORIGINAL MUJEEB DEVICE INTERFACE (4 Cols on Desktop, Full on Mobile/Tablet) -->
+        <section class="md:col-span-2 lg:col-span-4 flex flex-col gap-4">
+            <div class="glass-panel device-bezel rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+                
+                <!-- Physical Device Accent Lines -->
+                <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-mjeeb-teal to-transparent opacity-80"></div>
+
+                <!-- Device Top Branding Bar -->
+                <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+                        <span class="text-xs font-bold text-slate-200 tracking-wide">وحدة مُجيب المحمولة</span>
+                    </div>
+                    <span class="text-[9px] sm:text-[10px] bg-mjeeb-teal/20 text-mjeeb-teal font-mono font-bold px-2 py-0.5 rounded-full border border-mjeeb-teal/40">
+                        MUJEEB OS
+                    </span>
+                </div>
+
+                <!-- ORIGINAL MUJEEB SIMULATED LCD DISPLAY SCREEN -->
+                <div class="my-2.5 sm:my-3 rounded-xl sm:rounded-2xl lcd-screen p-3 sm:p-3.5 flex flex-col justify-between min-h-[280px] sm:min-h-[310px] relative">
+                    
+                    <div class="flex justify-between items-center text-[10px] sm:text-[11px] text-mjeeb-teal border-b border-mjeeb-teal/20 pb-1 mb-2">
+                        <div class="font-black flex items-center gap-1">
+                            <i class="fa-solid fa-microchip text-xs"></i>
+                            <span>مُجيب</span> | <span class="font-mono">HARDWARE</span>
+                        </div>
+                        <div id="deviceClock" class="font-mono text-slate-400 font-bold">14:47</div>
+                    </div>
+
+                    <!-- Current Device Instruction -->
+                    <div class="my-1">
+                        <div class="text-[10px] text-slate-400 mb-1 flex items-center gap-1">
+                            <i class="fa-solid fa-robot text-mjeeb-teal"></i>
+                            <span>توجيهات وحدة دعم القرار:</span>
+                        </div>
+                        <div id="deviceInstruction" class="text-xs sm:text-sm font-bold text-white bg-mjeeb-teal/10 p-2.5 sm:p-3 rounded-xl border border-mjeeb-teal/30 leading-relaxed min-h-[60px] flex items-center">
+                            اضغط "ابدأ التقييم الأولي" للبدء في إجراءات الفحص الإسعافي الميداني.
+                        </div>
+                    </div>
+
+                    <!-- Measurements Result Grid (Revealed progressively) -->
+                    <div class="grid grid-cols-2 gap-1.5 sm:gap-2 my-2 text-center text-xs">
+                        <div class="bg-slate-900/80 border border-white/10 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all">
+                            <div class="text-[9px] sm:text-[10px] text-slate-400">النبض / الأكسجين</div>
+                            <div id="resPulseSpo2" class="font-extrabold text-slate-500 my-0.5 sm:my-1 font-mono text-xs sm:text-sm">-- / --</div>
+                            <div id="tagPulse" class="text-[8px] sm:text-[9px] text-slate-500">لم يتم القياس</div>
+                        </div>
+                        <div class="bg-slate-900/80 border border-white/10 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all">
+                            <div class="text-[9px] sm:text-[10px] text-slate-400">ضغط الدم</div>
+                            <div id="resBP" class="font-extrabold text-slate-500 my-0.5 sm:my-1 font-mono text-xs sm:text-sm">--/--</div>
+                            <div id="tagBP" class="text-[8px] sm:text-[9px] text-slate-500">لم يتم القياس</div>
+                        </div>
+                        <div class="bg-slate-900/80 border border-white/10 rounded-lg sm:rounded-xl p-1.5 sm:p-2 transition-all">
+                            <div class="text-[9px] sm:text-[10px] text-slate-400">معدل التنفس</div>
+                            <div id="resResp" class="font-extrabold text-slate-500 my-0.5 sm:my-1 font-mono text-xs sm:text-sm">--/دقيقة</div>
+                            <div id="tagResp" class="text-[8px] sm:text-[9px] text-slate-500">لم يتم التقييم</div>
+                        </div>
+                        <div class="bg-slate-900/80 border border-white/10 rounded-xl p-1.5 sm:p-2 transition-all">
+                            <div class="text-[9px] sm:text-[10px] text-slate-400">درجة الحرارة</div>
+                            <div id="resTemp" class="font-extrabold text-slate-500 my-0.5 sm:my-1 font-mono text-xs sm:text-sm">-- °C</div>
+                            <div id="tagTemp" class="text-[8px] sm:text-[9px] text-slate-500">لم يتم القياس</div>
+                        </div>
+                    </div>
+
+                    <div class="text-[8px] sm:text-[9px] justify-between items-center flex text-slate-400 font-mono pt-1 border-t border-white/10">
+                        <span>الحساسات: متصلة</span>
+                        <span>SIMULATED</span>
+                    </div>
+                </div>
+
+                <!-- STAGE-BASED DYNAMIC STEP CONTROLS -->
+                <div id="interactiveControlsArea" class="space-y-2 mt-1">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
+
+                <!-- Device Emergency Call Action Button -->
+                <button onclick="triggerEmergencyCall()" class="mt-2.5 w-full bg-red-600/90 hover:bg-red-600 active:scale-98 text-white font-bold py-2.5 px-3 rounded-xl text-xs transition flex items-center justify-center gap-2 border border-red-500/50 shadow-lg shadow-red-950/60">
+                    <i class="fa-solid fa-phone-flip text-xs"></i>
+                    <span>اتصال الطوارئ — 997 (محاكاة)</span>
+                </button>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- EMERGENCY CALL SIMULATED MODAL -->
+    <div id="emergencyModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="glass-panel max-w-md w-full rounded-2xl p-4 sm:p-6 border-2 border-red-500 shadow-2xl text-center space-y-3 sm:space-y-4 my-auto">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 bg-red-500/20 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-500/40 text-2xl sm:text-3xl">
+                <i class="fa-solid fa-phone-volume animate-pulse"></i>
+            </div>
+            <h3 class="text-base sm:text-lg font-black text-white">اتصال الطوارئ الإسعافي (997)</h3>
+            <div class="text-xs text-slate-200 leading-relaxed bg-red-950/50 p-2.5 sm:p-3 rounded-xl border border-red-800/40 text-right space-y-1">
+                <div>• تم تسجيل طلب الإسعاف ضمن المحاكاة.</div>
+                <div>• شارك موقع المريض ووصف الأعراض (ألم صدر، دوخة، ضيق تنفس).</div>
+                <div>• اتبع تعليمات مأمور الطوارئ واستمر في تقييم المريض.</div>
+            </div>
+            <div class="text-[10px] text-amber-300 bg-amber-950/40 p-2 rounded border border-amber-800/30">
+                هذا اتصال تجريبي تعليمي ولا يتم إجراء اتصال حقيقي بأرقام الطوارئ.
+            </div>
+            <button onclick="closeEmergencyModal()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl transition text-xs">
+                متابعة تقييم المريض
+            </button>
+        </div>
+    </div>
+
+    <!-- REASONING / EDUCATIONAL ALERT DIALOG -->
+    <div id="eduModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="glass-panel max-w-md w-full rounded-2xl p-4 sm:p-5 border border-amber-500/50 shadow-2xl text-center space-y-3 my-auto">
+            <div class="text-amber-400 text-2xl sm:text-3xl"><i class="fa-solid fa-circle-info"></i></div>
+            <h4 id="eduTitle" class="text-sm sm:text-base font-bold text-white">تنبيه تعليمي</h4>
+            <p id="eduBody" class="text-xs text-slate-300 leading-relaxed bg-white/5 p-2.5 sm:p-3 rounded-xl text-right">
+                توضيح تعليمي الإجراء المناسب.
+            </p>
+            <button onclick="closeEduModal()" class="w-full bg-mjeeb-teal text-navy-950 font-bold py-2 rounded-xl text-xs">
+                فهمت، العودة للمحاكاة
+            </button>
+        </div>
+    </div>
+
+    <!-- FINAL SUMMARY MODAL -->
+    <div id="summaryModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl p-4 sm:p-6 border border-mjeeb-teal/50 shadow-2xl space-y-3 sm:space-y-4 my-auto">
+            <div class="flex justify-between items-center border-b border-white/10 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-file-medical text-xl sm:text-2xl text-mjeeb-teal"></i>
+                    <h2 class="text-base sm:text-lg font-black text-white">ملخص الحالة والإجراءات الإسعافية</h2>
+                </div>
+                <span class="text-[10px] sm:text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-bold">مكتملة</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                <div class="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 space-y-1">
+                    <div class="font-bold text-mjeeb-teal mb-1">حالة المريض:</div>
+                    <div>العمر: <strong>46 سنة</strong> | الجنس: <strong>ذكر</strong></div>
+                    <div>الشكوى: <strong class="text-amber-300">ألم في الصدر</strong></div>
+                    <div>الأعراض: <strong>دوخة وضيق في التنفس</strong></div>
+                    <div>الوعي: <strong>مستيقظ ومستجيب</strong></div>
+                </div>
+
+                <div class="bg-white/5 p-2.5 sm:p-3 rounded-xl border border-white/10 space-y-1">
+                    <div class="font-bold text-mjeeb-teal mb-1">القياسات المكتملة:</div>
+                    <div>النبض: <strong>108 نبضة/دقيقة</strong> | الأكسجين: <strong>95%</strong></div>
+                    <div>ضغط الدم: <strong>150/90 mmHg</strong></div>
+                    <div>معدل التنفس: <strong>24 نفسًا/دقيقة</strong></div>
+                    <div>درجة الحرارة: <strong>36.8°C</strong></div>
+                </div>
+            </div>
+
+            <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 sm:p-3 rounded-xl text-xs text-amber-200 leading-relaxed">
+                <strong>التفسير الإسعافي:</strong> ألم الصدر مع ارتفاع النبض وضيق التنفس يستدعي تقييمًا طبيًا عاجلاً. تمثل هذه المحاكاة خطوات التقييم الأولي للمستجيب الأول قبل وصول المريض إلى المستشفى.
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-300 mb-1.5">السجل الزمني للإجراءات المنفذة:</h4>
+                <div id="summaryTimeline" class="bg-navy-950 p-2.5 sm:p-3 rounded-xl border border-white/10 text-xs space-y-1.5 max-h-32 sm:max-h-36 overflow-y-auto">
+                </div>
+            </div>
+
+            <button onclick="resetSimulation()" class="w-full bg-mjeeb-teal hover:bg-mjeeb-blue text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 text-xs sm:text-sm">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>إعادة المحاكاة</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="w-full glass-panel py-2 px-3 sm:px-4 border-t border-white/10 text-center text-[10px] sm:text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1">
+            <div>مُجيب | MUJEEB — محاكاة الاستجابة الإسعافية الأولية قبل المستشفى</div>
+            <div class="text-slate-500 text-[10px]">بيانات تعليمية محاكاة — SIMULATED TRAINING DATA</div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT STEP-BY-STEP SIMULATION LOGIC -->
+    <script>
+        const simState = {
+            stage: 1,
+            emergencyCallDone: false,
+            measuredPulse: false,
+            measuredBP: false,
+            evaluatedResp: false,
+            measuredTemp: false,
+            reassured: false,
+            positioned: false,
+            monitored: false,
+            timeline: []
+        };
+
+        window.onload = function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            renderCurrentStage();
+        };
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('deviceClock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+
+        function recordAction(actionText) {
+            if (!simState.timeline.includes(actionText)) {
+                simState.timeline.push(actionText);
+                updateTimelineDisplay();
+            }
+        }
+
+        function updateTimelineDisplay() {
+            const list = document.getElementById('timelineMiniList');
+            document.getElementById('completedCount').innerText = `${simState.timeline.length}/10`;
+            if (simState.timeline.length === 0) {
+                list.innerHTML = `<div class="text-slate-500 italic text-center py-1">في انتظار بدء الخطوات</div>`;
+                return;
+            }
+            list.innerHTML = simState.timeline.map(item => `
+                <div class="flex items-center gap-1.5 text-slate-200">
+                    <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i>
+                    <span class="truncate">${item}</span>
+                </div>
+            `).join('');
+        }
+
+        function triggerEmergencyCall() {
+            simState.emergencyCallDone = true;
+            recordAction("تم تسجيل طلب الإسعاف (997)");
+            document.getElementById('emergencyModal').classList.remove('hidden');
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+            if (simState.stage === 3) {
+                simState.stage = 4;
+                renderCurrentStage();
+            }
+        }
+
+        function showEduModal(title, body) {
+            document.getElementById('eduTitle').innerText = title;
+            document.getElementById('eduBody').innerText = body;
+            document.getElementById('eduModal').classList.remove('hidden');
+        }
+
+        function closeEduModal() {
+            document.getElementById('eduModal').classList.add('hidden');
+        }
+
+        // MAIN STAGE RENDERER
+        function renderCurrentStage() {
+            const inst = document.getElementById('deviceInstruction');
+            const stageTitle = document.getElementById('currentStageTitle');
+            const stageDesc = document.getElementById('currentStageDesc');
+            const sceneText = document.getElementById('sceneActionText');
+            const ctrl = document.getElementById('interactiveControlsArea');
+
+            switch(simState.stage) {
+                case 1: // Stage 1 — استقبال المريض
+                    stageTitle.innerText = "المرحلة 1: استقبال المريض";
+                    stageDesc.innerText = "وصلت إلى شخص سقط أو تعب في مكان عام. يعاني من ألم في الصدر ودوخة وضيق في التنفس.";
+                    inst.innerText = "وصلت إلى المريض في مكان عام. يعاني من ألم في الصدر ودوخة وضيق في التنفس.";
+                    sceneText.innerText = "المستجيب الأول يرى شخصاً متكئاً في مكان عام ويبدو عليه الإجهاد.";
+                    recordAction("تم استقبال المريض في مكان عام.");
+
+                    ctrl.innerHTML = `
+                        <button onclick="advanceStage(2)" class="w-full bg-mjeeb-teal hover:bg-mjeeb-blue text-navy-950 font-extrabold py-2.5 sm:py-3 px-4 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <span>ابدأ التقييم الأولي</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </button>
+                    `;
+                    break;
+
+                case 2: // Stage 2 — تقييم سلامة الموقع والوعي
+                    stageTitle.innerText = "المرحلة 2: سلامة المكان وفحص الوعي";
+                    stageDesc.innerText = "تأكد من سلامة الموقع العام، ثم اقترب من المريض وافحص درجة استجابته ووعيه.";
+                    inst.innerText = "تأكد أولًا من سلامة المكان العام المحيط قبل الاقتراب من المريض.";
+                    sceneText.innerText = "المستجيب يفحص سلامة البيئة العامة للموقع.";
+
+                    ctrl.innerHTML = `
+                        <div id="safetyStep1">
+                            <button onclick="confirmSafety()" class="w-full bg-mjeeb-teal hover:bg-mjeeb-blue text-navy-950 font-extrabold py-2.5 sm:py-3 px-4 rounded-xl shadow-lg transition text-xs sm:text-sm">
+                                تم التأكد من سلامة الموقع العام
+                            </button>
+                        </div>
+                        <div id="safetyStep2" class="hidden space-y-2">
+                            <div class="text-[11px] text-slate-300 font-bold mb-1">اقترب وافحص درجة وعي واستجابة المريض:</div>
+                            <button onclick="handleResponsiveness(true)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 sm:py-2.5 rounded-xl text-xs">
+                                1. فحص الوعي: المريض مستيقظ ومستجيب
+                            </button>
+                            <button onclick="handleResponsiveness(false)" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-2 sm:py-2.5 rounded-xl text-xs border border-white/10">
+                                2. فحص الوعي: المريض غائب عن الوعي
+                            </button>
+                        </div>
+                    `;
+                    break;
+
+                case 3: // Stage 3 — تقييم الأعراض والاتصال المبكر بالإسعاف
+                    stageTitle.innerText = "المرحلة 3: طلب الإسعاف المبكر";
+                    stageDesc.innerText = "ألم الصدر مع الدوخة وضيق التنفس تستدعي الاتصال الفوري بالإسعاف.";
+                    inst.innerText = "المريض يعاني من ألم في الصدر ودوخة وضيق في التنفس. هذه أعراض تستدعي طلب المساعدة الطبية العاجلة. لا تنتظر اكتمال جميع القياسات قبل الاتصال بالإسعاف.";
+                    sceneText.innerText = "يجب الاتصال بالإسعاف فوراً بدون تأخير.";
+
+                    ctrl.innerHTML = `
+                        <button onclick="triggerEmergencyCall()" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold py-3 sm:py-3.5 px-4 rounded-xl shadow-lg transition animate-bounce flex items-center justify-center gap-2 text-xs sm:text-sm">
+                            <i class="fa-solid fa-phone-flip"></i>
+                            <span>اتصال الطوارئ — 997</span>
+                        </button>
+                    `;
+                    break;
+
+                case 4: // Stage 4 — اختيار القياس الأول
+                    stageTitle.innerText = "المرحلة 4: اختيار القياسات";
+                    stageDesc.innerText = "اختر القياس الحيوي المطلوب تنفيذه الآن بواسطة جهاز مُجيب.";
+                    inst.innerText = "لنبدأ بقياس العلامات الحيوية للمريض. اختر الإجراء الأول.";
+                    sceneText.innerText = "جهاز مُجيب جاهز لقياس العلامات الحيوية.";
+
+                    renderMeasurementMenu();
+                    break;
+
+                case 5: // Stage 5 — قياس النبض والأكسجين
+                    stageTitle.innerText = "المرحلة 5: قياس النبض والأكسجين";
+                    stageDesc.innerText = "تثبيت حساس الأكسجين والنبض على إصبع المريض.";
+                    inst.innerText = "ضع حساس الأكسجين على إصبع المريض. تأكد من تثبيت الحساس بشكل صحيح.";
+                    sceneText.innerText = "المستجيب يضع حساس الأكسجين على إصبع المريض.";
+                    document.getElementById('sensorAttachmentFinger').classList.remove('hidden');
+
+                    ctrl.innerHTML = `
+                        <button onclick="executePulseMeasurement()" class="w-full bg-amber-500 hover:bg-amber-600 text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            تم وضع الحساس
+                        </button>
+                    `;
+                    break;
+
+                case 6: // Stage 6 — قياس ضغط الدم
+                    stageTitle.innerText = "المرحلة 6: قياس ضغط الدم";
+                    stageDesc.innerText = "وضع كفة قياس ضغط الدم على ذراع المريض.";
+                    inst.innerText = "الآن لنقيس ضغط الدم. ضع كفة الضغط على ذراع المريض بالطريقة الموضحة.";
+                    sceneText.innerText = "المستجيب يقوم بتثبيت كفة ضغط الدم على ذراع المريض.";
+                    document.getElementById('sensorAttachmentCuff').classList.remove('hidden');
+
+                    ctrl.innerHTML = `
+                        <button onclick="executeBPMeasurement()" class="w-full bg-amber-500 hover:bg-amber-600 text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            تم وضع الكفة
+                        </button>
+                    `;
+                    break;
+
+                case 7: // Stage 7 — تقييم التنفس
+                    stageTitle.innerText = "المرحلة 7: تقييم التنفس";
+                    stageDesc.innerText = "ملاحظة ومراقبة تنفس المريض خلال دقيقة كاملة.";
+                    inst.innerText = "لاحظ تنفس المريض. راقب عدد مرات التنفس خلال دقيقة، ولاحظ وجود صعوبة في التنفس.";
+                    sceneText.innerText = "المستجيب يراقب حركة الصدر ومعدل التنفس.";
+
+                    ctrl.innerHTML = `
+                        <button onclick="executeRespEvaluation()" class="w-full bg-amber-500 hover:bg-amber-600 text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            تم تقييم التنفس
+                        </button>
+                    `;
+                    break;
+
+                case 8: // Stage 8 — قياس درجة الحرارة
+                    stageTitle.innerText = "المرحلة 8: قياس درجة الحرارة";
+                    stageDesc.innerText = "استخدام حساس الحرارة لقياس درجة حرارة المريض.";
+                    inst.innerText = "الآن لنقيس درجة حرارة المريض. استخدم حساس الحرارة الموضح في الجهاز.";
+                    sceneText.innerText = "المستجيب يضع حساس درجة الحرارة.";
+                    document.getElementById('sensorAttachmentTemp').classList.remove('hidden');
+
+                    ctrl.innerHTML = `
+                        <button onclick="executeTempMeasurement()" class="w-full bg-amber-500 hover:bg-amber-600 text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            تم إجراء القياس
+                        </button>
+                    `;
+                    break;
+
+                case 9: // Stage 9 — ملخص العلامات الحيوية
+                    stageTitle.innerText = "المرحلة 9: ملخص العلامات الحيوية";
+                    stageDesc.innerText = "تم اكتمال جميع القياسات الحيوية بنجاح.";
+                    inst.innerText = "المريض يعاني من ألم في الصدر، وارتفاع في النبض، وتنفس سريع. تتطلب هذه الحالة تقييمًا طبيًا عاجلاً. لا تنتظر تحسن الأعراض قبل طلب المساعدة.";
+                    sceneText.innerText = "عرض نتائج جميع القياسات الحيوية المكتملة.";
+
+                    ctrl.innerHTML = `
+                        <button onclick="advanceStage(10)" class="w-full bg-mjeeb-teal hover:bg-mjeeb-blue text-navy-950 font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            الانتقال لتعليمات المستجيب الأول <i class="fa-solid fa-arrow-left mr-1"></i>
+                        </button>
+                    `;
+                    break;
+
+                case 10: // Stage 10 — تعليمات المستجيب الأول
+                    stageTitle.innerText = "المرحلة 10: إجراءات تقديم الدعم";
+                    stageDesc.innerText = "تقديم خطوات الرعاية والدعم حتى وصول الإسعاف.";
+                    inst.innerText = "اتبع الإجراءات التالية لتقديم الدعم والمساعدة للمريض.";
+                    sceneText.innerText = "المستجيب يطبق إجراءات الدعم النفسي والجسدي للمريض.";
+
+                    renderFirstResponderActions();
+                    break;
+
+                case 11: // Stage 11 — المرحلة النهائية
+                    stageTitle.innerText = "المرحلة النهائية: ملخص الحالة";
+                    stageDesc.innerText = "اكتملت جميع خطوات التقييم والرعاية الميدانية.";
+                    inst.innerText = "ألم الصدر مع ارتفاع النبض وضيق التنفس يستدعي تقييمًا طبيًا عاجلًا. تمثل هذه المحاكاة خطوات التقييم الأولي للمستجيب الأول قبل وصول المريض إلى المستشفى.";
+                    sceneText.innerText = "اكتملت المحاكاة الإسعافية بنجاح.";
+
+                    ctrl.innerHTML = `
+                        <button onclick="showFinalSummaryModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 sm:py-3 rounded-xl transition text-xs sm:text-sm">
+                            عرض ملخص الحالة النهائي <i class="fa-solid fa-clipboard-check mr-1"></i>
+                        </button>
+                    `;
+                    break;
+            }
+        }
+
+        function advanceStage(nextStage) {
+            simState.stage = nextStage;
+            renderCurrentStage();
+        }
+
+        // STAGE 2 LOGIC
+        function confirmSafety() {
+            recordAction("تم التأكد من سلامة الموقع العام.");
+            document.getElementById('deviceInstruction').innerText = "اقترب من المريض الآن وافحص درجة استجابته ووعيه (تحدث معه واضغط على الكتف بنفق رفق).";
+            document.getElementById('sceneActionText').innerText = "المستجيب يقترب ويفحص وعي واستجابة المريض.";
+            document.getElementById('safetyStep1').classList.add('hidden');
+            document.getElementById('safetyStep2').classList.remove('hidden');
+        }
+
+        function handleResponsiveness(isResponsive) {
+            if (isResponsive) {
+                recordAction("تم فحص الوعي: (المريض مستيقظ ومستجيب).");
+                const awarenessTag = document.getElementById('patientAwarenessTag');
+                awarenessTag.innerText = "مستيقظ ومستجيب";
+                awarenessTag.className = "font-extrabold text-emerald-400 text-xs animate-pulse";
+
+                document.getElementById('deviceInstruction').innerText = "المريض مستيقظ ويستجيب للكلام. استمر في التقييم الأولي.";
+                setTimeout(() => {
+                    advanceStage(3);
+                }, 1200);
+            } else {
+                showEduModal("إجراء طوارئ", "في حال كان المريض غير مستجيب، يجب فحص التنفس فوراً وطلب الإسعاف والبدء بالإنعاش القلبي الرئوي إذا كان لا يتنفس. في هذا السيناريو المحدد المريض مستجيب.");
+            }
+        }
+
+        // STAGE 4 MEASUREMENT MENU RENDERER
+        function renderMeasurementMenu() {
+            const ctrl = document.getElementById('interactiveControlsArea');
+            ctrl.innerHTML = `
+                <div class="space-y-1.5 text-xs">
+                    <button onclick="advanceStage(5)" class="w-full ${simState.measuredPulse ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 sm:p-2.5 rounded-xl border flex items-center justify-between font-bold">
+                        <span>1. قياس النبض والأكسجين</span>
+                        ${simState.measuredPulse ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-heart-pulse text-mjeeb-teal"></i>'}
+                    </button>
+                    <button onclick="advanceStage(6)" class="w-full ${simState.measuredBP ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 sm:p-2.5 rounded-xl border flex items-center justify-between font-bold">
+                        <span>2. قياس ضغط الدم</span>
+                        ${simState.measuredBP ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-gauge-high text-mjeeb-teal"></i>'}
+                    </button>
+                    <button onclick="advanceStage(7)" class="w-full ${simState.evaluatedResp ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 sm:p-2.5 rounded-xl border flex items-center justify-between font-bold">
+                        <span>3. تقييم التنفس</span>
+                        ${simState.evaluatedResp ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-lungs text-mjeeb-teal"></i>'}
+                    </button>
+                    <button onclick="advanceStage(8)" class="w-full ${simState.measuredTemp ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 sm:p-2.5 rounded-xl border flex items-center justify-between font-bold">
+                        <span>4. قياس درجة الحرارة</span>
+                        ${simState.measuredTemp ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-temperature-high text-mjeeb-teal"></i>'}
+                    </button>
+                </div>
+            `;
+
+            if (simState.measuredPulse && simState.measuredBP && simState.evaluatedResp && simState.measuredTemp) {
+                ctrl.innerHTML += `
+                    <button onclick="advanceStage(9)" class="w-full bg-mjeeb-teal text-navy-950 font-extrabold py-2.5 rounded-xl mt-2 text-xs">
+                        عرض ملخص القياسات <i class="fa-solid fa-arrow-left mr-1"></i>
+                    </button>
+                `;
+            }
+        }
+
+        // STAGE 5 EXECUTION
+        function executePulseMeasurement() {
+            document.getElementById('deviceInstruction').innerText = "جاري قياس النبض والأكسجين...";
+            setTimeout(() => {
+                simState.measuredPulse = true;
+                recordAction("تم قياس النبض والأكسجين.");
+                document.getElementById('resPulseSpo2').innerHTML = `<span class="text-red-400">108</span> / <span class="text-emerald-400">95%</span>`;
+                document.getElementById('tagPulse').innerText = "بيانات محاكاة";
+                document.getElementById('tagPulse').className = "text-[9px] text-red-400 font-bold";
+
+                document.getElementById('deviceInstruction').innerText = "النبض مرتفع (108 نبضة/دقيقة). ألم الصدر مع ارتفاع النبض يستدعي تقييمًا طبيًا عاجلاً.";
+                
+                document.getElementById('interactiveControlsArea').innerHTML = `
+                    <button onclick="advanceStage(4)" class="w-full bg-mjeeb-teal text-navy-950 font-bold py-2.5 rounded-xl text-xs">
+                        القياس التالي
+                    </button>
+                `;
+            }, 1000);
+        }
+
+        // STAGE 6 EXECUTION
+        function executeBPMeasurement() {
+            document.getElementById('deviceInstruction').innerText = "جاري قياس ضغط الدم...";
+            setTimeout(() => {
+                simState.measuredBP = true;
+                recordAction("تم قياس ضغط الدم.");
+                document.getElementById('resBP').innerHTML = `<span class="text-amber-400">150/90</span>`;
+                document.getElementById('tagBP').innerText = "بيانات محاكاة";
+                document.getElementById('tagBP').className = "text-[9px] text-amber-400 font-bold";
+
+                document.getElementById('deviceInstruction').innerText = "ضغط الدم 150/90 mmHg (مرتفع عن المستوى المعتاد). استمر في التقييم وراقب حالة المريض.";
+                
+                document.getElementById('interactiveControlsArea').innerHTML = `
+                    <button onclick="advanceStage(4)" class="w-full bg-mjeeb-teal text-navy-950 font-bold py-2.5 rounded-xl text-xs">
+                        القياس التالي
+                    </button>
+                `;
+            }, 1000);
+        }
+
+        // STAGE 7 EXECUTION
+        function executeRespEvaluation() {
+            simState.evaluatedResp = true;
+            recordAction("تم تقييم التنفس.");
+            document.getElementById('resResp').innerHTML = `<span class="text-amber-400">24/دقيقة</span>`;
+            document.getElementById('tagResp').innerText = "بيانات محاكاة";
+            document.getElementById('tagResp').className = "text-[9px] text-amber-400 font-bold";
+
+            document.getElementById('deviceInstruction').innerText = "تنفس المريض سريع (24 نفسًا/دقيقة)، ويعاني من ضيق في التنفس. استمر في مراقبته واطلب المساعدة الطبية العاجلة.";
+            
+            document.getElementById('interactiveControlsArea').innerHTML = `
+                <button onclick="advanceStage(4)" class="w-full bg-mjeeb-teal text-navy-950 font-bold py-2.5 rounded-xl text-xs">
+                    القياس التالي
+                </button>
+            `;
+        }
+
+        // STAGE 8 EXECUTION
+        function executeTempMeasurement() {
+            document.getElementById('deviceInstruction').innerText = "جاري قياس درجة الحرارة...";
+            setTimeout(() => {
+                simState.measuredTemp = true;
+                recordAction("تم قياس درجة الحرارة.");
+                document.getElementById('resTemp').innerHTML = `<span class="text-emerald-400">36.8 °C</span>`;
+                document.getElementById('tagTemp').innerText = "بيانات محاكاة";
+                document.getElementById('tagTemp').className = "text-[9px] text-emerald-400 font-bold";
+
+                document.getElementById('deviceInstruction').innerText = "تم تسجيل درجة الحرارة بنجاح (36.8°C).";
+                
+                document.getElementById('interactiveControlsArea').innerHTML = `
+                    <button onclick="advanceStage(9)" class="w-full bg-mjeeb-teal text-navy-950 font-bold py-2.5 rounded-xl text-xs">
+                        عرض ملخص القياسات
+                    </button>
+                `;
+            }, 1000);
+        }
+
+        // STAGE 10 FIRST RESPONDER ACTIONS RENDERER
+        function renderFirstResponderActions() {
+            const ctrl = document.getElementById('interactiveControlsArea');
+            ctrl.innerHTML = `
+                <div class="space-y-1.5 text-xs">
+                    <button onclick="actionReassure()" class="w-full ${simState.reassured ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 rounded-xl border flex justify-between items-center">
+                        <span>1. طمأنة المريض</span>
+                        ${simState.reassured ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-heart text-red-400"></i>'}
+                    </button>
+                    <button onclick="actionPosition()" class="w-full ${simState.positioned ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 rounded-xl border flex justify-between items-center">
+                        <span>2. وضعية المريض (نصف جالس)</span>
+                        ${simState.positioned ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-chair text-amber-400"></i>'}
+                    </button>
+                    <button onclick="actionMonitor()" class="w-full ${simState.monitored ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' : 'bg-white/10 hover:bg-white/20 text-white'} p-2 rounded-xl border flex justify-between items-center">
+                        <span>3. عدم ترك المريض ومراقبته</span>
+                        ${simState.monitored ? '<i class="fa-solid fa-check text-emerald-400"></i>' : '<i class="fa-solid fa-eye text-emerald-400"></i>'}
+                    </button>
+                </div>
+            `;
+
+            if (simState.reassured && simState.positioned && simState.monitored) {
+                ctrl.innerHTML += `
+                    <button onclick="advanceStage(11)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold py-2.5 rounded-xl mt-2 text-xs">
+                        الانتقال للملخص النهائي <i class="fa-solid fa-arrow-left mr-1"></i>
+                    </button>
+                `;
+            }
+        }
+
+        function actionReassure() {
+            simState.reassured = true;
+            recordAction("تمت طمأنة المريض.");
+            document.getElementById('deviceInstruction').innerText = "ابقَ بجانب المريض. تحدث معه بهدوء. أخبره أن المساعدة الطبية في الطريق.";
+            document.getElementById('sceneActionText').innerText = "المستجيب يتحدث بهدوء ويطمئن المريض.";
+            renderFirstResponderActions();
+        }
+
+        function actionPosition() {
+            simState.positioned = true;
+            recordAction("تمت مساعدة المريض على اتخاذ وضعية مريحة.");
+            document.getElementById('deviceInstruction').innerText = "ساعد المريض على اتخاذ وضعية مريحة للتنفس (نصف جالس). لا تجبره على الاستلقاء إذا كان ذلك يزيد ضيق التنفس.";
+            document.getElementById('sceneActionText').innerText = "المستجيب يساعد المريض على الاتكاء بوضعية نصف جالس مريحة.";
+            document.getElementById('patientPostureTag').innerText = "وضعية نصف جالس مريحة للتنفس";
+            renderFirstResponderActions();
+        }
+
+        function actionMonitor() {
+            simState.monitored = true;
+            recordAction("تمت متابعة حالة المريض.");
+            document.getElementById('deviceInstruction').innerText = "ابقَ مع المريض حتى وصول الإسعاف. راقب مستوى الوعي والتنفس. إذا تغيرت حالة المريض، أعد تقييمه فورًا.";
+            document.getElementById('sceneActionText').innerText = "المستجيب يراقب العلامات الحيوية والوعي باستمرار.";
+            renderFirstResponderActions();
+        }
+
+        // SHOW FINAL SUMMARY MODAL
+        function showFinalSummaryModal() {
+            const sumTimeline = document.getElementById('summaryTimeline');
+            sumTimeline.innerHTML = simState.timeline.map(item => `
+                <div class="flex items-center gap-2 text-slate-200">
+                    <i class="fa-solid fa-check text-mjeeb-teal"></i>
+                    <span>${item}</span>
+                </div>
+            `).join('');
+
+            document.getElementById('summaryModal').classList.remove('hidden');
+        }
+
+        // RESET SIMULATION
+        function resetSimulation() {
+            simState.stage = 1;
+            simState.emergencyCallDone = false;
+            simState.measuredPulse = false;
+            simState.measuredBP = false;
+            simState.evaluatedResp = false;
+            simState.measuredTemp = false;
+            simState.reassured = false;
+            simState.positioned = false;
+            simState.monitored = false;
+            simState.timeline = [];
+
+            document.getElementById('summaryModal').classList.add('hidden');
+            document.getElementById('sensorAttachmentFinger').classList.add('hidden');
+            document.getElementById('sensorAttachmentCuff').classList.add('hidden');
+            document.getElementById('sensorAttachmentTemp').classList.add('hidden');
+
+            document.getElementById('resPulseSpo2').innerText = "-- / --";
+            document.getElementById('resBP').innerText = "--/--";
+            document.getElementById('resResp').innerText = "--/دقيقة";
+            document.getElementById('resTemp').innerText = "-- °C";
+
+            const awarenessTag = document.getElementById('patientAwarenessTag');
+            awarenessTag.innerText = "مجهولة / لم تفحص";
+            awarenessTag.className = "font-bold text-slate-400 text-xs";
+
+            document.getElementById('tagPulse').innerText = "لم يتم القياس";
+            document.getElementById('tagPulse').className = "text-[8px] sm:text-[9px] text-slate-500";
+            document.getElementById('tagBP').innerText = "لم يتم القياس";
+            document.getElementById('tagBP').className = "text-[8px] sm:text-[9px] text-slate-500";
+            document.getElementById('tagResp').innerText = "لم يتم التقييم";
+            document.getElementById('tagResp').className = "text-[8px] sm:text-[9px] text-slate-500";
+            document.getElementById('tagTemp').innerText = "لم يتم القياس";
+            document.getElementById('tagTemp').className = "text-[8px] sm:text-[9px] text-slate-500";
+
+            document.getElementById('patientPostureTag').innerText = "متكئ في مكان عام";
+
+            updateTimelineDisplay();
+            renderCurrentStage();
+        }
+    </script>
+</body>
+</html>
